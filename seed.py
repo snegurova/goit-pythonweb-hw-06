@@ -28,23 +28,22 @@ def seed():
     session.add_all(groups)
     session.commit()
 
-    teachers = [Teacher(full_name=fake.name()) for _ in range(5)]  # 5 викладачів
+    teachers = [Teacher(full_name=fake.name()) for _ in range(5)]
     session.add_all(teachers)
     session.commit()
 
-    subjects = [Subject(name=fake.job(), teacher=random.choice(teachers)) for _ in range(6)]  # 6 предметів
+    subjects = [Subject(name=fake.job(), teacher=random.choice(teachers)) for _ in range(6)]
     session.add_all(subjects)
     session.commit()
 
     students = []
-    for group in groups:  # Переконайся, що кожна група має хоча б одного студента
-        for _ in range(random.randint(10, 15)):  # Додаємо від 10 до 15 студентів у кожну групу
+    for group in groups:
+        for _ in range(random.randint(10, 15)):
             student = Student(full_name=fake.name(), group=group)
             students.append(student)
     session.add_all(students)
     session.commit()
 
-    # Переконайся, що кожен предмет має хоча б одну оцінку
     for subject in subjects:
         student = random.choice(students)
         grade = Grade(
@@ -55,7 +54,6 @@ def seed():
         )
         session.add(grade)
 
-    # Додаємо оцінки для всіх студентів і предметів
     for student in students:
         for subject in subjects:
             for _ in range(random.randint(1, 4)):
