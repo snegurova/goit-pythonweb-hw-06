@@ -60,6 +60,28 @@ def select_10(student_id, teacher_id):
         Subject.teacher_id == teacher_id
     ).distinct().all()
 
+def select_11(student_id, teacher_id):
+    return session.query(func.avg(Grade.grade)) \
+        .join(Subject, Grade.subject_id == Subject.id) \
+        .filter(Subject.teacher_id == teacher_id, Grade.student_id == student_id) \
+        .scalar()
+
+def select_12(group_id, subject_id):
+    last_date = session.query(func.max(Grade.date_received)) \
+        .join(Student).filter(Student.group_id == group_id, Grade.subject_id == subject_id) \
+        .scalar()
+
+    return session.query(
+        Student.full_name,
+        Grade.grade,
+        Grade.date_received
+    ).join(Grade) \
+     .filter(
+        Student.group_id == group_id,
+        Grade.subject_id == subject_id,
+        Grade.date_received == last_date
+    ).all()
+
 if __name__ == "__main__":  
     print("Top 5 students by average grade:")
     print(select_1())
@@ -90,3 +112,10 @@ if __name__ == "__main__":
     
     print("\nCourses taught by teacher 1 to student 1:")
     print(select_10(1, 1))
+
+    print("\nAverage grade teacher 1 gave to student 1:")
+    print(select_11(1, 1))
+
+    print("\nGrades on the last lesson in group 1 for subject 1:")
+    for name, grade, date in select_12(1, 1):
+        print(f"{name}: {grade} on {date.date()}")
